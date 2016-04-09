@@ -7,8 +7,8 @@ on cafe.id_cafe = employe.id_cafe
 group by cafe.code_postal
 having cafe.code_postal like '75%')
 
--- b) en supposant que les 2 premiers chiffres donnent le département
-select max(utilisation),nom_ingredient,code_postal
+-- b) en supposant que les 2 premiers chiffres donnent le dÃ©partement
+select max(utilisation),nom_ingredient,substr(code_postal,0,3)
 from(
 select sum(c.nombre*ci.nombre) as utilisation ,ing.nom as nom_ingredient , code_postal
 from commande
@@ -23,4 +23,4 @@ on ( c.id_item = i.id_item and ci.taille= c.taille)
 join ingredient ing
 on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
-group by code_postal
+group by substr(code_postal,0,3)
