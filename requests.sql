@@ -25,6 +25,15 @@ on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
 group by substr(code_postal,0,3)
 
+-- o) en supposant que les departements sont deduits des 2 premiers chiffres
+select substr(cafe.code_postal,0,3),cafe.pays, sum(cv.genre ='M'),sum(cv.genre='Ms')
+from client_vip cv
+join commande c
+on c.id_vip = cv.id_client
+join cafe 
+on cafe.id_cafe = c.id_cafe
+group by substr(cafe.code_postal,0,3), cafe.pays
+
 -- p)
 select i.nom, SUM(ci.nombre) as quantite
 from commande
