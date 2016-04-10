@@ -68,8 +68,16 @@ join cafe bb
 on aa.id_cafe = bb.id_cafe where code_postal = '92240'
 
 
+-- g  // Extraire le bénéfice moyen de chaque pays sur l’ensemble des produits vendus 
 
 
+-- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
+
+-- i // Extraire le nombre moyen de ventes réalisées pour chaque heure par un employé ayant moins d’1 an d’expérience 
+
+-- J // Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
+
+-- K // Extraire la moyenne des notes attribuées pour chaque manager aux employés sous leurs  ordres
 
 
 
