@@ -61,12 +61,20 @@ left join  (select id_cafe, count(id_personne) as [ttl employe] from employe gro
 on bb.id_cafe = cc.id_cafe
 where  [ttl employe] IS NULL
 
---f extraire stock du cafe 92240 -- a faire ajouter colonne avec les valeurs
-select  cc.nom,pays,code_postal, stock,  "a commander" from stock aa
+--f extraire stock du cafe 92240
+select  cc.nom,pays,code_postal, stock,  
+(CASE 
+	WHEN stock >= 1000 THEN  'OK'
+	WHEN stock >= 750 and stock <= 999 THEN  'en stock'
+	WHEN stock >= 500 and stock <= 749 THEN  'pas d urgence'
+	WHEN stock >= 250 and stock <=499 THEN  'urgence'
+	WHEN stock >= 1 and stock <= 249 THEN  'prioritaire'
+	ELSE
+        'Rupture de stock'
+    END) as 'A commander' 	from stock aa
 join Ingredient cc on aa.id_ingredient = cc.id_ingredient
 join cafe bb
 on aa.id_cafe = bb.id_cafe where code_postal = '92240'
-
 
 -- g  // Extraire le bénéfice moyen de chaque pays sur l’ensemble des produits vendus 
 
