@@ -25,6 +25,13 @@ on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
 group by substr(code_postal,0,3)
 
+-- n)
+select id_personne,count(*) as nb_changements
+from employe
+group by id_personne
+ORDER BY nb_changements DESC
+LIMIT 10;
+
 -- o) en supposant que les departements sont deduits des 2 premiers chiffres
 select substr(cafe.code_postal,0,3),cafe.pays, sum(cv.genre ='M'),sum(cv.genre='Ms')
 from client_vip cv
