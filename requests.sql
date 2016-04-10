@@ -25,6 +25,54 @@ on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
 group by substr(code_postal,0,3)
 
+
+-- c) selection du cafe ayant la masse salariale la plus basses
+select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  employe 
+join Salaire  aa 
+on employe.id_personne = aa.id_personne 
+join  CAFE bb
+on bb.id_cafe = employe.id_cafe 
+where aa.annee = 2016
+group by  employe.id_cafe order by [masse salariale] DESC
+
+
+--select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  employe 
+--join (select * from Salaire where annee = 2016.) as aa 
+--on employe.id_personne = aa.id_personne 
+--join  (select  id_cafe, pays, code_postal from CAFE) as bb
+--on bb.id_cafe = employe.id_cafe
+--group by  employe.id_cafe order by [masse salariale] DESC
+
+-- d.Extraire la boisson la moins vendue entre 00h00 et 11h59 pour chaque café. (Colonne 1: cafe, colonne 2: boisson, colonne 3: quantite)
+-- a faire : changer le type pour le metre sous format date
+select id_cafe, nom, min(ee.pp) from (
+select  id_cafe, nom, count (nombre) as pp from Commande as cc
+inner join (select  * from  commande_item as aa
+join  (select * from item  where type in ('BOISSON')) as bb
+on aa.id_item = bb.id_item) as dd
+on cc.id_commande = dd.id_commande  --where cc.heure > '#00:00:00# 'and cc.heure<'#11:59:00#'
+group by id_cafe, nom order by pp ASC) as ee group by ee.id_cafe
+
+
+-- e.Extraire les cafés n’ayant pas encore ouvert (sans employés). (Colonne 1: cafe)
+
+select  pays, code_postal from CAFE as bb
+left join  (select id_cafe, count(id_personne) as [ttl employe] from employe group by employe.id_cafe ) as cc
+on bb.id_cafe = cc.id_cafe
+where  [ttl employe] IS NULL
+
+--f extraire stock du cafe 92240 -- a faire ajouter colonne avec les valeurs
+select  cc.nom,pays,code_postal, stock,  "a commander" from stock aa
+join Ingredient cc on aa.id_ingredient = cc.id_ingredient
+join cafe bb
+on aa.id_cafe = bb.id_cafe where code_postal = '92240'
+
+
+
+
+
+
+
 -- l)id du vendeur BorneRapide == 0
 select  (CASE WHEN vendeur ==0 THEN
         'Bornelibre'
