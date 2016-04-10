@@ -444,7 +444,7 @@ INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (4
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (5,'10:30:00','ESPECES',NULL,8,2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (5,8,NULL,1);
 
-INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (6,'09:30:00','CB',5,11,2);
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (6,'09:30:00','CB',6,11,2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (6,3,'MOYENNI',2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (6,8,NULL,1);
 
