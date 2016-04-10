@@ -25,6 +25,19 @@ on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
 group by substr(code_postal,0,3)
 
+-- l)id du vendeur BorneRapide == 0
+select  (CASE WHEN vendeur ==0 THEN
+        'Bornelibre'
+    ELSE
+        'Autres'
+    END) as type_vendeur , count(*) nb_vente
+from (select (id_vendeur !=0) as vendeur
+from cafe 
+join commande c 
+on c.id_cafe = cafe.id_cafe
+where code_postal = '92240')
+group by vendeur
+
 -- m)
 select *
 from menu
