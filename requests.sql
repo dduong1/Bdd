@@ -25,6 +25,12 @@ on ing.id_ingredient = c.id_ingredient
 group by ing.nom, cafe.code_postal)
 group by substr(code_postal,0,3)
 
+-- m)
+select *
+from menu
+where code_pays IN ('FRANCE' ,'ANGLETERRE')
+ORDER BY reduction DESC
+
 -- n)
 select id_personne,count(*) as nb_changements
 from employe
