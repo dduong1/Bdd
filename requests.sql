@@ -80,12 +80,32 @@ on aa.id_cafe = bb.id_cafe where code_postal = '92240'
 
 
 -- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
+-- ajouter de la data
+select cc.code_postal ,avg(montant) as [Salaire moyen] from Employe as aa
+join salaire as ss
+on ss.id_personne = aa.id_personne
+join cafe as cc
+on cc.id_cafe = aa.id_cafe
+where aa.date_debut <  date('now','-2 year') and aa.date_fin is null and annee = '2016' 
+group by aa.id_cafe order by [Salaire moyen] desc  LIMIT 10;
+
 
 -- i // Extraire le nombre moyen de ventes réalisées pour chaque heure par un employé ayant moins d’1 an d’expérience 
 
 -- J // Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
 
 -- K // Extraire la moyenne des notes attribuées pour chaque manager aux employés sous leurs  ordres
+select * from employe as aa
+join salaire as bb
+on aa.id_personne = bb.id_personne
+inner join 
+select id_personne as 'id_mgr' from  employe where domaine = 'MANAGER'
+
+select * from employe  as aa
+inner join  (select id_personne as 'id_mgr' from  employe where domaine = 'MANAGER' and date_fin is NULL group by id_personne ) as bb
+on aa.id_manager = bb.id_mgr
+join (select note, id_personne from salaire where annee = 2016 )as cc
+on aa.id_personne = cc.id_personne
 
 
 
