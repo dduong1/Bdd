@@ -77,7 +77,50 @@ join cafe bb
 on aa.id_cafe = bb.id_cafe where code_postal = '92240'
 
 -- g  // Extraire le bénéfice moyen de chaque pays sur l’ensemble des produits vendus 
+select SUM(prix_vente_final - prix_achat) as benefice , pays
+from(
+select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  ELSE prix_vente END) prix_vente_final , prix_achat, pays
+from commande 
+join commande_item ci 
+on ci.id_commande = commande.id_commande
+join cafe 
+on cafe.id_cafe = commande.id_cafe
+join (
+select i.id_item as id_item, carte.code_pays,sum(ing.prix * c.nombre) prix_achat, c.taille, (CASE WHEN taille = 'PETITI' THEN carte.prix_petiti  WHEN taille = 'MOYENNI' THEN carte.prix_moyenni  WHEN taille = 'LARGI' THEN carte.prix_largi END) as prix_vente
+from item i
+join carte
+on carte.item_id = i.id_item
+join  composition c
+on c.id_item = i.id_item
+join ingredient ing
+on ing.id_ingredient = c.id_ingredient
+group by i.id_item,carte.code_pays,c.taille) table_prix
+on ci.id_item = table_prix.id_item and table_prix.code_pays = cafe.pays and table_prix.taille = ci.taille
 
+UNION
+
+select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  - prix_vente * (reduction/100.0)ELSE prix_vente - prix_vente * (reduction/100) END) prix_vente_final , prix_achat, pays  
+from menu m
+join commande 
+on m.id_menu = commande.id_menu
+join menu_item mi 
+on mi.id_menu = m.id_menu
+join cafe 
+on cafe.id_cafe = commande.id_cafe
+join (
+select i.id_item as id_item, carte.code_pays,sum(ing.prix * c.nombre) prix_achat, c.taille, (CASE WHEN taille = 'PETITI' THEN carte.prix_petiti  WHEN taille = 'MOYENNI' THEN carte.prix_moyenni  WHEN taille = 'LARGI' THEN carte.prix_largi END) as prix_vente
+from item i
+join carte
+on carte.item_id = i.id_item
+join  composition c
+on c.id_item = i.id_item
+join ingredient ing
+on ing.id_ingredient = c.id_ingredient
+group by i.id_item,carte.code_pays,c.taille) table_prix
+on mi.id_item = table_prix.id_item and table_prix.code_pays = cafe.pays and table_prix.taille = commande.taille_menu
+
+)
+group by pays
 
 -- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
 -- ajouter de la data
