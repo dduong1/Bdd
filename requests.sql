@@ -94,6 +94,63 @@ group by aa.id_cafe order by [Salaire moyen] desc  LIMIT 10;
 
 -- J // Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
 
+select AVG(CA) as CA_moyen, coworking
+from(
+select SUM(prix_final * nombre) as CA, coworking,id_cafe
+from
+(
+select (  CASE WHEN est_vip THEN prix - prix * 0.1
+ELSE prix 
+END)  as prix_final , coworking,id_cafe ,nombre
+from(
+
+select  (CASE WHEN ci.taille == 'PETITI' THEN
+        c.prix_petiti
+		WHEN ci.taille='MOYENNI' THEN
+		c.prix_moyenni
+		WHEN ci.taille='LARGI' THEN
+		c.prix_largi
+    ELSE
+        c.prix_petiti
+    END) as prix, ci.nombre as nombre, coworking,(commande.id_vip IS NOT NULL) est_vip,cafe.id_cafe as id_cafe 
+from commande
+join cafe
+on cafe.id_cafe = commande.id_cafe
+join commande_item ci
+on ci.id_commande= commande.id_commande
+join carte c
+on c.item_id = ci.id_item and cafe.pays= c.code_pays)
+
+UNION
+
+select (  CASE WHEN est_vip THEN prix - prix * (reduction/100.0)
+ELSE prix - prix * (reduction/100.0)
+END) as prix_final , coworking, id_cafe,1
+from(
+select (CASE WHEN commande.taille_menu == 'PETITI' AND i.type='BOISSON' THEN
+        c.prix_petiti
+		WHEN commande.taille_menu='MOYENNI'  AND i.type='BOISSON' THEN
+		c.prix_moyenni
+		WHEN commande.taille_menu='LARGI'  AND i.type='BOISSON' THEN
+		c.prix_largi
+    ELSE
+        c.prix_petiti
+    END) as prix,  (commande.id_vip IS NOT NULL) est_vip, coworking, cafe.id_cafe as id_cafe, (commande.id_menu IS NOT NULL) en_menu, commande.id_commande,menu.reduction as reduction
+from menu
+join commande
+on menu.id_menu =  commande.id_menu 
+join cafe
+on cafe.id_cafe = commande.id_cafe
+join menu_item mi
+on mi.id_menu= commande.id_menu
+join carte c
+on c.item_id = mi.id_item and cafe.pays= c.code_pays
+join item i
+on i.id_item = c.item_id)
+)
+group by id_cafe)
+group by coworking
+
 -- K // Extraire la moyenne des notes attribuées pour chaque manager aux employés sous leurs  ordres
 select * from employe as aa
 join salaire as bb
