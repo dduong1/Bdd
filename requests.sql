@@ -134,6 +134,15 @@ group by aa.id_cafe order by [Salaire moyen] desc  LIMIT 10;
 
 
 -- i // Extraire le nombre moyen de ventes réalisées pour chaque heure par un employé ayant moins d’1 an d’expérience 
+select h as Heure , avg(nombre_vente_par_heure) as NbVentes
+from(select count(*) as nombre_vente_par_heure,strftime('%H',heure) h,id_vendeur
+from commande 
+where id_vendeur in (select id_personne
+from (select id_personne,  SUM( (CASE WHEN date_fin is null then julianday('now') else julianday(date_fin) end) - julianday(date_debut) ) as anciennete from poste group by id_personne )
+where anciennete <366
+)
+group by id_vendeur,strftime('%H',heure))
+group by h
 
 -- J // Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
 
