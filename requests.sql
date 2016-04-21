@@ -45,7 +45,7 @@ on poste.id_personne = aa.id_personne
 join  CAFE bb
 on bb.id_cafe = poste.id_cafe 
 where aa.annee = 2016
-group by  poste.id_cafe order by [masse salariale] DESC
+group by  poste.id_cafe order by [masse salariale] ASC LIMIT 1
 
 
 -- d.Extraire la boisson la moins vendue entre 00h00 et 11h59 pour chaque café. (Colonne 1: cafe, colonne 2: boisson, colonne 3: quantite)
