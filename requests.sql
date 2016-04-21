@@ -36,6 +36,9 @@ group by substr(code_postal,0,3)
 
 
 -- c) selection du cafe ayant la masse salariale la plus basses
+-- L'idée est de trouver une table regroupant le salaire des employés avec l'information café nous permettant de faire un group.
+-- Le group associé de sum, nous permet de faire la somme de tous les salaires des employés d'un café pour une année donnée (ici 2016)
+-- On ordonne par ordre décroissant.
 select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  poste 
 join Salaire  aa 
 on poste.id_personne = aa.id_personne 
@@ -45,15 +48,10 @@ where aa.annee = 2016
 group by  poste.id_cafe order by [masse salariale] DESC
 
 
---select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  poste 
---join (select * from Salaire where annee = 2016.) as aa 
---on poste.id_personne = aa.id_personne 
---join  (select  id_cafe, pays, code_postal from CAFE) as bb
---on bb.id_cafe = poste.id_cafe
---group by  poste.id_cafe order by [masse salariale] DESC
-
 -- d.Extraire la boisson la moins vendue entre 00h00 et 11h59 pour chaque café. (Colonne 1: cafe, colonne 2: boisson, colonne 3: quantite)
--- a faire : changer le type pour le metre sous format date
+-- Dans un premier temps on cherche à récupérer toutes les ventes pour chaque café. 
+-- On filtre alors les ventes par type d'item vendu: on s'intéresse aux boissons puis on filtre par date pour obtenir la période désirée.
+
 select id_cafe, nom, min(ee.pp) from (
 select  id_cafe, nom, count (nombre) as pp from Commande as cc
 inner join (select  * from  commande_item as aa
@@ -64,13 +62,15 @@ group by id_cafe, nom order by pp ASC) as ee group by ee.id_cafe
 
 
 -- e.Extraire les cafés n’ayant pas encore ouvert (sans employés). (Colonne 1: cafe)
-
+-- On récupére le nombre d'employé par café. On fait un count et on ne garde que les cafés avec nombre d'employé == NULL
 select  pays, code_postal from CAFE as bb
 left join  (select id_cafe, count(id_personne) as [ttl poste] from poste group by poste.id_cafe ) as cc
 on bb.id_cafe = cc.id_cafe
 where  [ttl poste] IS NULL
 
 --f extraire stock du cafe 92240
+-- On fait les jointures nécessaires afin d'obtenir les bonnes correspondances entre les items name par café. On filtre par code postal. 
+-- On présente les résutlats de manière filtrée avec un CASE.
 select  cc.nom,pays,code_postal, stock,  
 (CASE 
 	WHEN stock >= 1000 THEN  'OK'
@@ -146,7 +146,8 @@ group by id_cafe)
 group by pays
 
 -- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
--- ajouter de la data
+-- On cherche à obtenir un tableau faisant la moyenne des employés ayant au moins 2 ans d'ancienneté (on fait ici la différence entre la date actuelle
+-- et la date d'embauche  date('now','-2 year') ) . On groupe par café. On ordonne par ordre décroissant et on fixe la limite à 10.
 select cc.code_postal ,avg(montant) as [Salaire moyen] from poste as aa
 join salaire as ss
 on ss.id_personne = aa.id_personne
@@ -157,6 +158,9 @@ group by aa.id_cafe order by [Salaire moyen] desc  LIMIT 10;
 
 
 -- i // Extraire le nombre moyen de ventes réalisées pour chaque heure par un employé ayant moins d’1 an d’expérience 
+-- On filtre les employées ayant moins d'un an d'expérience.
+-- On fait le total par employé du nombre de vente par heure par deux select sur la table commandes et la table poste)
+
 select h as Heure , avg(nombre_vente_par_heure) as NbVentes
 from(select count(*) as nombre_vente_par_heure,strftime('%H',heure) h,id_vendeur
 from commande 
