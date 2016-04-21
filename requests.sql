@@ -57,7 +57,8 @@ select  id_cafe, nom, count (nombre) as pp from Commande as cc
 inner join (select  * from  commande_item as aa
 join  (select * from item  where type in ('BOISSON')) as bb
 on aa.id_item = bb.id_item) as dd
-on cc.id_commande = dd.id_commande  --where cc.heure > '#00:00:00# 'and cc.heure<'#11:59:00#'
+on cc.id_commande = dd.id_commande 
+where time(cc.heure) >= time('00:00') and time(cc.heure) <= time('11:59')
 group by id_cafe, nom order by pp ASC) as ee group by ee.id_cafe
 
 
