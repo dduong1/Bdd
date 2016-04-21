@@ -1,9 +1,9 @@
 -- a)
-select SUM(nb) as nb_employes
+select SUM(nb) as nb_postes
 from (select count(*)  as nb
-from employe 
+from poste 
 join cafe
-on cafe.id_cafe = employe.id_cafe
+on cafe.id_cafe = poste.id_cafe
 group by cafe.code_postal
 having cafe.code_postal like '75%')
 
@@ -27,21 +27,21 @@ group by substr(code_postal,0,3)
 
 
 -- c) selection du cafe ayant la masse salariale la plus basses
-select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  employe 
+select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  poste 
 join Salaire  aa 
-on employe.id_personne = aa.id_personne 
+on poste.id_personne = aa.id_personne 
 join  CAFE bb
-on bb.id_cafe = employe.id_cafe 
+on bb.id_cafe = poste.id_cafe 
 where aa.annee = 2016
-group by  employe.id_cafe order by [masse salariale] DESC
+group by  poste.id_cafe order by [masse salariale] DESC
 
 
---select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  employe 
+--select bb.pays, bb.code_postal  as [cafe],  sum(aa.montant) as [masse salariale] from  poste 
 --join (select * from Salaire where annee = 2016.) as aa 
---on employe.id_personne = aa.id_personne 
+--on poste.id_personne = aa.id_personne 
 --join  (select  id_cafe, pays, code_postal from CAFE) as bb
---on bb.id_cafe = employe.id_cafe
---group by  employe.id_cafe order by [masse salariale] DESC
+--on bb.id_cafe = poste.id_cafe
+--group by  poste.id_cafe order by [masse salariale] DESC
 
 -- d.Extraire la boisson la moins vendue entre 00h00 et 11h59 pour chaque café. (Colonne 1: cafe, colonne 2: boisson, colonne 3: quantite)
 -- a faire : changer le type pour le metre sous format date
@@ -57,9 +57,9 @@ group by id_cafe, nom order by pp ASC) as ee group by ee.id_cafe
 -- e.Extraire les cafés n’ayant pas encore ouvert (sans employés). (Colonne 1: cafe)
 
 select  pays, code_postal from CAFE as bb
-left join  (select id_cafe, count(id_personne) as [ttl employe] from employe group by employe.id_cafe ) as cc
+left join  (select id_cafe, count(id_personne) as [ttl poste] from poste group by poste.id_cafe ) as cc
 on bb.id_cafe = cc.id_cafe
-where  [ttl employe] IS NULL
+where  [ttl poste] IS NULL
 
 --f extraire stock du cafe 92240
 select  cc.nom,pays,code_postal, stock,  
@@ -124,7 +124,7 @@ group by pays
 
 -- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
 -- ajouter de la data
-select cc.code_postal ,avg(montant) as [Salaire moyen] from Employe as aa
+select cc.code_postal ,avg(montant) as [Salaire moyen] from poste as aa
 join salaire as ss
 on ss.id_personne = aa.id_personne
 join cafe as cc
@@ -204,14 +204,14 @@ group by id_cafe)
 group by coworking
 
 -- K // Extraire la moyenne des notes attribuées pour chaque manager aux employés sous leurs  ordres
-select * from employe as aa
+select * from poste as aa
 join salaire as bb
 on aa.id_personne = bb.id_personne
 inner join 
-select id_personne as 'id_mgr' from  employe where domaine = 'MANAGER'
+select id_personne as 'id_mgr' from  poste where domaine = 'MANAGER'
 
-select * from employe  as aa
-inner join  (select id_personne as 'id_mgr' from  employe where domaine = 'MANAGER' and date_fin is NULL group by id_personne ) as bb
+select * from poste  as aa
+inner join  (select id_personne as 'id_mgr' from  poste where domaine = 'MANAGER' and date_fin is NULL group by id_personne ) as bb
 on aa.id_manager = bb.id_mgr
 join (select note, id_personne from salaire where annee = 2016 )as cc
 on aa.id_personne = cc.id_personne
@@ -239,7 +239,7 @@ ORDER BY reduction DESC
 
 -- n)
 select id_personne,count(*) as nb_changements
-from employe
+from poste
 group by id_personne
 ORDER BY nb_changements DESC
 LIMIT 10;
