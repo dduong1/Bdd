@@ -49,13 +49,15 @@ group by  poste.id_cafe order by [masse salariale] DESC
 
 
 -- d.Extraire la boisson la moins vendue entre 00h00 et 11h59 pour chaque café. (Colonne 1: cafe, colonne 2: boisson, colonne 3: quantite)
--- Dans un premier temps on cherche à récupérer toutes les ventes pour chaque café. 
--- On filtre alors les ventes par type d'item vendu: on s'intéresse aux boissons puis on filtre par date pour obtenir la période désirée.
-
+-- Nous séparons les commandes en deux. Les commandes faites avec menus et les commandes faites sans.
+-- On récupère que les commandes faites entre 00h00 et 11h59 et on prend que les boissons.
+-- Dans un menu, les boissons commandées sont de l'ordre de 1 . Sans menu, on se base sur le nombre.
+-- Après on somme le nombre pour chaque boisson dans chaque café et on récupère le minimum.
 select id_cafe, nom as boisson , min(quantite_totale) quantite
 from(
 select id_cafe, id_item, nom, sum(nombre) quantite_totale
 from(
+-- ventes sans menus
 select id_cafe,commande.id_commande,boissons.id_item, nom, nombre
 from commande
 join commande_item ci 
@@ -65,7 +67,7 @@ on boissons.id_item = ci.id_item
 where time(commande.heure) >= time('00:00') and time(commande.heure) <= time('11:59')
 
 union 
-
+-- ventes avec menus
 select id_cafe,commande.id_commande, boissons.id_item, nom, 1
 from commande
 join menu_item mi
