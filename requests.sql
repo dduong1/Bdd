@@ -52,14 +52,30 @@ group by  poste.id_cafe order by [masse salariale] DESC
 -- Dans un premier temps on cherche à récupérer toutes les ventes pour chaque café. 
 -- On filtre alors les ventes par type d'item vendu: on s'intéresse aux boissons puis on filtre par date pour obtenir la période désirée.
 
-select id_cafe, nom, min(ee.pp) from (
-select  id_cafe, nom, count (nombre) as pp from Commande as cc
-inner join (select  * from  commande_item as aa
-join  (select * from item  where type in ('BOISSON')) as bb
-on aa.id_item = bb.id_item) as dd
-on cc.id_commande = dd.id_commande 
-where time(cc.heure) >= time('00:00') and time(cc.heure) <= time('11:59')
-group by id_cafe, nom order by pp ASC) as ee group by ee.id_cafe
+select id_cafe, nom as boisson , min(quantite_totale) quantite
+from(
+select id_cafe, id_item, nom, sum(nombre) quantite_totale
+from(
+select id_cafe,commande.id_commande,boissons.id_item, nom, nombre
+from commande
+join commande_item ci 
+on ci.id_commande = commande.id_commande
+join  (select * from item  where type = 'BOISSON') as boissons
+on boissons.id_item = ci.id_item
+where time(commande.heure) >= time('00:00') and time(commande.heure) <= time('11:59')
+
+union 
+
+select id_cafe,commande.id_commande, boissons.id_item, nom, 1
+from commande
+join menu_item mi
+on commande.id_menu = mi.id_menu
+join  (select * from item  where type = 'BOISSON') as boissons
+on boissons.id_item = mi.id_item
+where time(commande.heure) >= time('00:00') and time(commande.heure) <= time('11:59')
+)
+group by id_cafe, id_item)
+group by id_cafe
 
 
 -- e.Extraire les cafés n’ayant pas encore ouvert (sans employés). (Colonne 1: cafe)
