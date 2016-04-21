@@ -259,17 +259,13 @@ group by id_cafe)
 group by coworking
 
 -- K // Extraire la moyenne des notes attribuées pour chaque manager aux employés sous leurs  ordres
-select * from poste as aa
-join salaire as bb
-on aa.id_personne = bb.id_personne
-inner join 
-select id_personne as 'id_mgr' from  poste where domaine = 'MANAGER'
-
-select * from poste  as aa
+-- On extrait les postes que l'on croise avec la liste des managers. On Recupere les notes par ailleurs que l'on croise avec le résultat précédent. On prend l'id manager et on prend la moyenne des note avec AVG. 
+select  id_manager, avg(note) from poste  as aa
 inner join  (select id_personne as 'id_mgr' from  poste where domaine = 'MANAGER' and date_fin is NULL group by id_personne ) as bb
 on aa.id_manager = bb.id_mgr
 join (select note, id_personne from salaire where annee = 2016 )as cc
 on aa.id_personne = cc.id_personne
+group by id_manager
 
 
 
