@@ -1,13 +1,22 @@
--- a)
-select SUM(nb) as nb_postes
+-- On suppose que les 2 premiers chiffres du code postal d'un pays donnent le département 
+
+-- a) Extraire le nombre d’employés dans le département du 75.
+-- On récupère les cafés dont le code postal commencent pas 75 et puis on fait la somme des employés présents dans ces cafés à la date d'aujourd'hui.
+-- Les employés qui sont présents actuellement sont ceux dont la date de fin de leur poste est nulle.
+-- Les directeurs ne figurent pas dans le nombre d'employés.
+select SUM(nb) as nb_employes
 from (select count(*)  as nb
 from poste 
 join cafe
 on cafe.id_cafe = poste.id_cafe
+where poste.date_fin is null
 group by cafe.code_postal
 having cafe.code_postal like '75%')
 
--- b) en supposant que les 2 premiers chiffres donnent le département
+-- b) Extraire l’ingrédient le plus utilisé dans chaque département.
+-- L'utilisation d'un ingredient dans une commande varie en fonction de la taille de la boisson et du nombre commandé de cet item dans la commande.
+-- L'utilisation d'un ingredient dans une commande pour un item est égal au nombre commandé de fois de cet item * quantité d'ingrédients nécessaires pour la taille commandé.
+-- On somme le tout et on récupère le max de l'utilisation.
 select max(utilisation),nom_ingredient,substr(code_postal,0,3)
 from(
 select sum(c.nombre*ci.nombre) as utilisation ,ing.nom as nom_ingredient , code_postal
@@ -76,10 +85,22 @@ join Ingredient cc on aa.id_ingredient = cc.id_ingredient
 join cafe bb
 on aa.id_cafe = bb.id_cafe where code_postal = '92240'
 
--- g  // Extraire le bénéfice moyen de chaque pays sur l’ensemble des produits vendus 
-select SUM(prix_vente_final - prix_achat) as benefice , pays
+-- g.  Extraire le bénéfice moyen de chaque pays sur l’ensemble des produits vendus
+-- Le bénéfice est calculé de la façon suivante : prix de vente - prix d'achat
+-- Le prix de vente de chaque boisson est précisé dans la table de la carte en fonction de la taille, le prix de vente d'un accompagnement est précisé dans la table dans le champ 'prix_petiti'.
+-- Le prix d'achat est la somme des prix d'achat des ingrédients qui le compose.
+-- Lorsqu'il s'agit d'un client VIP, le prix de vente est réduit de 10%.
+-- Lorsque la commande comprend un menu, le prix de vente est réduit de la réduction du menu (en pourcentage)
+-- Dans la requête, on sépare les ventes faites avec menus et celles sans menus.
+-- Le bénéfice moyen pour chaque pays veut dire la moyenne des bénéfices des cafés dans le pays auquel ils appartiennent.
+
+select AVG(benefice_cafe) as BenefMoyen ,pays
+FROM (
+-- Calcul des benefices par café avec leur pays
+select SUM(prix_vente_final - prix_achat) as benefice_cafe , id_cafe,pays
 from(
-select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  ELSE prix_vente END) prix_vente_final , prix_achat, pays
+-- Récupération des ventes sans menus 
+select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  ELSE prix_vente END) prix_vente_final , prix_achat, pays, cafe.id_cafe
 from commande 
 join commande_item ci 
 on ci.id_commande = commande.id_commande
@@ -99,7 +120,8 @@ on ci.id_item = table_prix.id_item and table_prix.code_pays = cafe.pays and tabl
 
 UNION
 
-select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  - prix_vente * (reduction/100.0)ELSE prix_vente - prix_vente * (reduction/100) END) prix_vente_final , prix_achat, pays  
+-- Récupération des ventes avec menus
+select (CASE WHEN id_vip is not null THEN prix_vente  - prix_vente*0.1  - prix_vente * (reduction/100.0)ELSE prix_vente - prix_vente * (reduction/100) END) prix_vente_final , prix_achat, pays , cafe.id_cafe
 from menu m
 join commande 
 on m.id_menu = commande.id_menu
@@ -120,6 +142,7 @@ group by i.id_item,carte.code_pays,c.taille) table_prix
 on mi.id_item = table_prix.id_item and table_prix.code_pays = cafe.pays and table_prix.taille = commande.taille_menu
 
 )
+group by id_cafe)
 group by pays
 
 -- h // Extraire le top 10 des cafés payant le mieux leurs employés ayant plus de deux ans d’expérience.
@@ -144,13 +167,21 @@ where anciennete <366
 group by id_vendeur,strftime('%H',heure))
 group by h
 
--- J // Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
+-- j. Extraire le chiffre d’affaire moyen des cafés ayant un espace de coworking et celui des cafés n’en ayant pas
+-- Le chiffre d'affaires représente la somme des ventes des commandes pour chaque café.
+-- Le prix de vente de chaque boisson est précisé dans la table de la carte en fonction de la taille, le prix de vente d'un accompagnement est précisé dans la table dans le champ 'prix_petiti'.
+-- Lorsqu'il s'agit d'un client VIP, le prix de vente est réduit de 10%.
+-- Lorsque la commande comprend un menu, le prix de vente est réduit de la réduction du menu (en pourcentage)
+-- Dans la requête, on sépare les ventes faites avec menus et celles sans menus.
+-- Ensuite on somme les prix de vente en gardant le type du café (coworking ou pas)
+-- On fait la moyenne pour chacun des types de cafés
 
 select AVG(CA) as CA_moyen, coworking
 from(
 select SUM(prix_final * nombre) as CA, coworking,id_cafe
 from
 (
+-- Commandes sans menus
 select (  CASE WHEN est_vip THEN prix - prix * 0.1
 ELSE prix 
 END)  as prix_final , coworking,id_cafe ,nombre
@@ -175,6 +206,7 @@ on c.item_id = ci.id_item and cafe.pays= c.code_pays)
 
 UNION
 
+-- Commandes avec menus
 select (  CASE WHEN est_vip THEN prix - prix * (reduction/100.0)
 ELSE prix - prix * (reduction/100.0)
 END) as prix_final , coworking, id_cafe,1
@@ -218,7 +250,9 @@ on aa.id_personne = cc.id_personne
 
 
 
--- l)id du vendeur BorneRapide == 0
+-- l. Extraire le nombre de vente pour le vendeur « BorneRapide » pour le magasin du 92240 ainsi que le nombre de vente pour l’ensemble des autres vendeurs
+-- Nous avons en BDD l'id du vendeur BorneRapide == 0
+-- Nous filtrons les café par code postal ensuite on récupère toutes les commandes où l'id vendeur = 0 puis les autres
 select  (CASE WHEN vendeur ==0 THEN
         'Bornelibre'
     ELSE
@@ -231,21 +265,27 @@ on c.id_cafe = cafe.id_cafe
 where code_postal = '92240')
 group by vendeur
 
--- m)
+-- m. Extraire l’ensemble des menus pour la France et l’Angleterre classés de la plus importante réduction à la moins importante
+-- Les réductions sont dans la table Menu, nous faisons un tri sur les réductions des menus des 2 pays
 select *
 from menu
 where code_pays IN ('FRANCE' ,'ANGLETERRE')
 ORDER BY reduction DESC
 
--- n)
+-- n. Extraire le top 10 des employés ayant le plus changé de fonction
+-- Le nombre de changements correspondent au nombre de poste que chaque personne a occupé dans sa carrière
+-- Nous groupons par personne et nous compte le nombre d'enregistrements dans Poste
 select id_personne,count(*) as nb_changements
 from poste
 group by id_personne
 ORDER BY nb_changements DESC
 LIMIT 10;
 
--- o) en supposant que les departements sont deduits des 2 premiers chiffres
-select substr(cafe.code_postal,0,3),cafe.pays, sum(cv.genre ='M'),sum(cv.genre='Ms')
+-- o. Extraire pour chaque département, la proportion d’homme et la proportion de femmes qui sont clients.
+-- On suppose que les départements sont déduits des 2 premiers chiffres du code postal
+-- Nous ne détenons que les genres des clients VIP. 
+-- Nous regroupons les commandes par département et par pays (si jamais il y a 2 cafés qui ont le même numéro de dept dans 2 pays différents) puis on calcule le pourcentage
+select substr(cafe.code_postal,0,3),cafe.pays,round(100.0 * sum(cv.genre ='M')/count(*),2),round(100.0 * sum(cv.genre='Ms')/count(*),2)
 from client_vip cv
 join commande c
 on c.id_vip = cv.id_client
@@ -253,7 +293,9 @@ join cafe
 on cafe.id_cafe = c.id_cafe
 group by substr(cafe.code_postal,0,3), cafe.pays
 
--- p)
+-- p. Extraire la liste des Items les plus vendus en France pour les moins de 40 ans. 
+-- Nous filtrons sur les commandes faites dans des cafés en France pour des clients VIP dont la date de naissance indique moins ou égal à 40 ans.
+-- Puis on regroupe par item et on somme la quantité commandée par item.
 select i.nom, SUM(ci.nombre) as quantite
 from commande
 join cafe 
@@ -264,6 +306,6 @@ join client_vip cv
 on cv.id_client = commande.id_vip
 join item i
 on i.id_item= ci.id_item
-where cafe.pays='FRANCE' and (2016 - strftime('%Y',cv.date_naissance)) <=40 and commande.id_vip IS NOT NULL
+where cafe.pays='FRANCE' and (date('now') - date(cv.date_naissance) ) <=40 and commande.id_vip IS NOT NULL
 group by ci.id_item
 order by quantite DESC
