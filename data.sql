@@ -1,12 +1,12 @@
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,100,'FRANCE','75001',1,1)
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,50,'ANGLETERRE','20000',1,2)
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,50,'FRANCE','75015',0,3);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,50,'MAROC','20000',1,4);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,500,'FRANCE','92240',1,5);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,150,'MAROC','2000',1,6);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,1500,'FRANCE','92240',1,7);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (0,1,500,'FRANCE','94100',1,8);
-INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,`est_ouvert`,'id_cafe') VALUES (1,1,50,'ESPAGNE','20000',1,9);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,100,'FRANCE','75001',1)
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,50,'ANGLETERRE','20000',2)
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,50,'FRANCE','75015',3);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,50,'MAROC','20000',4);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (0,1,500,'FRANCE','92240',5);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,150,'MAROC','2000',6);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,1500,'FRANCE','92240',7);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (0,1,500,'FRANCE','94100',8);
+INSERT INTO `CAFE`('coworking','bornes',`capacite`,`pays`,`code_postal`,'id_cafe') VALUES (1,1,50,'ESPAGNE','20000',9);
 
 --- Personne
 -- CAFE 1
@@ -436,6 +436,12 @@ INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_c
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (3,4,'LARGI',1);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (3,8,NULL,1);
 
+
+--- Commande en menus
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taile_menu') VALUES (13,'15:30:00','ESPECES',2,2,1,1,'PETITI');
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taile_menu') VALUES (14,'8:20:00','ESPECES',2,2,1,1,'PETITI');
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taile_menu') VALUES (15,'10:03:00','ESPECES',NULL,2,1,2,'MOYENNI');
+
 -- Cafe 2
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (4,'18:30:00','ESPECES',NULL,9,2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (4,4,'LARGI',1);
@@ -444,9 +450,14 @@ INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (4
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (5,'10:30:00','ESPECES',NULL,8,2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (5,8,NULL,1);
 
-INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (6,'09:30:00','CB',6,11,2);
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (6,'09:30:00','CB',5,11,2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (6,3,'MOYENNI',2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (6,8,NULL,1);
+
+--- Commande en menus
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu''taille_menu') VALUES (16,'7:30:00','CB',2,5,2,5,'PETITI');
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu''taille_menu') VALUES (17,'18:20:00','ESPECES',2,0,2,6,'PETITI');
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu''taille_menu') VALUES (18,'10:03:00','ESPECES',NULL,0,2,6,'PETITI');
 
 -- Cafe 4
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (7,'18:30:00','ESPECES',NULL,16,4);
@@ -460,6 +471,10 @@ INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_c
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (9,3,'MOYENNI',2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (9,8,NULL,1);
 
+-- Commande en menu
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taille_menu') VALUES (19,'09:30:00','ESPECES',NULL,18,4,3,'PETITI');
+
+
 -- Cafe 5
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (10,'17:30:00','ESPECES',NULL,0,5);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (10,4,'LARGI',1);
@@ -471,3 +486,7 @@ INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (1
 INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe') VALUES (12,'09:30:00','CB',4,0,5);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (12,3,'MOYENNI',2);
 INSERT INTO `Commande_Item`(`id_commande`,`id_item`,`taille`,`nombre`) VALUES (12,7,NULL,2);
+
+
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taille_menu') VALUES (20,'09:30:00','CB',NULL,0,5,1,'PETITI');
+INSERT INTO `Commande`('id_commande',`heure`,`moyen`,`id_vip`,`id_vendeur`,'id_cafe','id_menu','taille_menu') VALUES (21,'19:30:00','CB',NULL,0,5,2,'MOYENNI');
